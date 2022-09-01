@@ -76,6 +76,7 @@ class MyClass implement Interface1, Interface2, Interface3 {
 function name(paramters) return_type {
 
 }
+
 // lambda, clouser
 var clouser = function name() return_type {
 
@@ -95,6 +96,10 @@ class MyTemplateClass implement TempClass<T1, T2, ...> {
 
 	}
 
+
+	// 统统是private的
+	static var name type;
+	static const name type;
 }
 
 // RAII 是一个好文明 这个必须支持
@@ -207,6 +212,11 @@ interface SequenceIterator {
 constraint SequenceContainer {
 	function begin() SequenceIterator;
 	function end() SequenceIterator;
+	
+	// 后置类型
+	fn begin() SequenceIterator;
+	// 前置类型
+	SequenceIterator begin();
 }
 
 // 或许 function 关键字应该用 fn, 不然实在是打太多字了
@@ -224,6 +234,29 @@ typedef my_struct struct {
 // 模板的约束也后置，我们可以直接使用某个类型，当作模板类型，也可以使用约束当作类型
 template <container SequenceContainer, Fn fn ()>
 fn for_each(c container, fn Fn) {
+
+	// 后置
+	// go认为后置比前置好
+	var i = 0;	// 为了安全，可以强制初始化
+	var ii = 8;
+	const cd = 16.0;
+
+	// 前置
+	int i;
+	int ii = 8;
+	const int ci = 16;
+
+	// 哪怕是在C++里面，有了auto之后我也是这么写的
+	// 这本身就是一种后置类型说明
+	auto new = Type{};
+
+	// 但是为什么在定义变量的时候，后置类型就显得这么奇怪呢？？？
+	// 后置类型的话，词法解析器写起来也简单，所有的句子 我们只看第一个单词就知道是什么
+
+	// rust的默认常量设计的非常非常好，
+	// 其实这个设计也是为了ownership设计的，好文明，应该保留
+
+
 	for e in c {
 		fn();
 	}
