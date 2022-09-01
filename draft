@@ -1,0 +1,233 @@
+
+import a.b.c;
+export a.b.c;
+
+// 数据类型
+// 整型 int uint int8 uint8 int16 uint16 int32 uint32 int64 uint64 int128 uint128
+// 浮点型 float double quater
+// 字符 字符串 char string, char和string就是utf-8编码的
+// 要不默认提供向量支持 vector avx512
+// 
+
+if initializer; condition {
+
+} else if initializer; condition {
+
+} else {
+
+}
+
+// 或者我们也可以不需要switch
+// switch 绝对不允许fall throught
+
+// loop
+while {
+
+}
+
+while initializer; condition {
+	break;
+	continue;
+}
+
+for initializer in range {
+
+}
+ 
+// 注释
+/* */
+
+tuple ()
+array []
+struct {}
+slice
+
+interface Interface1 {
+
+}
+
+class MyClass implement Interface1, Interface2, Interface3 {
+	// 这样还稍微好看点
+	public static override 
+	function fun(var1 type1, var2 type2, ...) return_type {
+
+	}
+
+	// 然后默认的都是private的，就不用写private了
+	// 只有作为接口的需要写一个public
+
+	// 所有的filed都必须是private的
+	// 然后类会自动生成 get/set 方法以供调用
+
+	[private]
+	function private_fun(...) (return_type1, return type2) {
+
+	}
+
+	// 所有的filed都必须是private的
+	// 这个类型声明系统还是得仔细设计啊
+	// ownership先搞懂了再说吧
+	borrow_someone &string;
+	something int const&;
+}
+
+// 这样她们的语法就是一样的了
+// 函数和clouser
+function name(paramters) return_type {
+
+}
+// lambda, clouser
+var clouser = function name() return_type {
+
+}
+
+// 我保留模板唯一的目的其实就是c++ stl 容器和通用算法库
+// 没有这些东西 就像go一样，我就是排个序都那么麻烦
+template <Constraint T>
+class MyTemplateClass implement TempClass<T1, T2, ...> {
+
+	public
+	function new() return_type {
+
+	}
+
+	public function delete() return_type {
+
+	}
+
+}
+
+// RAII 是一个好文明 这个必须支持
+// 关于move和copy我们也需要讨论
+// 默认的行为是move，仅当类实现了copy时，我们才会copy
+// RAII结合工厂模式
+// 每个类都有一个new 同时也有一个delete
+
+// 请问我们能申请分配内存吗？
+// 语言内置 memory pool 怎么样
+// 这样可以防止内存泄漏，而且我们可以增加很多很多的内存方面的检测，提供性能优化等等
+// cool！
+// 如果确实用户就是想分配一大块内存，自己在上面胡作非为，我确实想不到比现在的C/C++更灵活的方案
+// 但是现在我们就不提供用户申请和释放内存的方法了
+
+// 线程与协程 应该采用go的形式
+// 也就是语言内置一个协程池
+// 用于创建的是协程 协程池自动管理
+// 两套并发编程模型，基于锁的和基于消息的
+
+// defer是一个好文明，
+// exception也是一个好文明
+// 现在的主流语言都是 try catch throw 没必要自己造新的词 支持就可以了
+
+// ownership 也是一个好文明
+// 个人觉得是类似于 unique_ptr 的东西
+// 当然rust也提供了shared_ptr 为什么我们不支持提供一个线程安全的shared_ptr
+// 然后所有的访问都是加锁的 这样不久非常安全了吗？？
+// 性能算个球，好写，安全，才最重要
+// 表达力强，语法清晰简单，安全，心智负担小！目标不是系统级语言和性能。
+
+// 元模板编程是否允许？
+// 元模板编程就是为了性能啊，编程的心智负担极大，所以还是算了，这种活还是让C++干吧
+
+function main() (var return_type) {
+	auto name = 5;
+
+	auto var2 = module1.class.method(...);
+}
+
+// C++里面的算法最重要的是什么！是迭代器啊，是各种各样的迭代器
+// 这些迭代器太牛逼了，几乎所有的算法所有的容器，就是由这个迭代器实现的
+// 我们的模板抽象里面当然要保留这些好的东西
+
+// 还有一个问题是，我们允许操作符重载吗？
+// 我们允许函数重载吗？
+// 好处：想不到
+// 坏处：no！不要保留函数重载和操作符重载，想想数据库里面的那个重载了不知道多少回的函数
+// 根本不知道这些函数想干什么，还特别怕调用出错，增加心智负担
+
+// 这是最关键的问题，只要结合的好，模板的问题我们就可以简化的好
+// 关键是constraint要怎么实现，和接口要怎么结合
+// 第一个问题就是 constraint 要怎么定义
+// 像go那样，使用接口定义？
+// 还是像C++那样，那么复杂的定义？
+// 不管怎么定义，我们的目的是 具有表达能力，我们能够将某个需求或者逻辑表达出来就可以了
+// 当然要尽可能表达的清晰易懂
+
+// 我们可以尽可能多的将一些常用的容器变成基本类型
+// 比如 string tuple array vector map list 都变成基本类型的话，也简单了
+
+interface any {
+
+}
+
+interface iterator {
+
+}
+
+// 接口定义的是什么？是我们可以做什么！
+interface RandomIterator {
+
+}
+
+// 在OO中，我们可以用接口实现动态多态性
+// 在模板中，我们实现的静态多态性，静态多态的目的是什么？模板的目的是什么？
+// 模板的目的是为了防止我们为每个类型都添加额外的相同的代码
+// 同时还要有约束，就是我们期望某个类型有什么功能，因为模板的实现中需要这些功能
+// 静态多态和动态多态对 “某种功能”这个要求重合了，所以interface作为constraint是天然合适的
+// 同时 constraint 还应该可以组合，我们希望都多个constraint
+// 我们有两种类型的constraint type 和 interface
+// 我觉得应该用一个新的关键字，constraint
+// 其实这就是go的constraint，我觉得设计还是不错的
+// 只不过应该用一个全新的关键字
+// 因为interface本身是设计给OO的，强行让他和模板混在一起不好
+// C++还有一种约束是 语义 约束，比如 copyable, moveable, ...
+// 这些也可以作为关键字加入，因为编程语言的使用者不允许自己定义新的语义，所以这些都是可控的
+
+constraint integer {
+	ints
+}
+// 不过constraint的语法到底应该如何设计，还是可以考虑一下的
+constraint container {
+	type [int, uint, int64]
+	interface new_constraint {
+		function fun() return_type;
+	}
+	semantic {
+		// 但是什么是语义呢？语义不就是接口吗！！
+		// 那这个东西就是不需要的，go也没有定义这个玩意
+	}
+}
+
+interface SequenceIterator {
+	function next();
+	function deref();
+}
+
+// 比方说，我想要定义一个顺序容器
+constraint SequenceContainer {
+	function begin() SequenceIterator;
+	function end() SequenceIterator;
+}
+
+// 或许 function 关键字应该用 fn, 不然实在是打太多字了
+
+// 保留typedef
+typedef new_type old_type;
+
+typedef my_struct struct {
+
+};
+
+// 如果我们内部的函数还对类型有要求，那是内部的事情
+// 我们这里就应该只写出我们的要求，要求可以一级一级的检查
+// 这样写起来简单，不用在最开始的地方就提出所有的约束
+// 模板的约束也后置，我们可以直接使用某个类型，当作模板类型，也可以使用约束当作类型
+template <container SequenceContainer, Fn fn ()>
+fn for_each(c container, fn Fn) {
+	for e in c {
+		fn();
+	}
+}
+
+// todo：设计出模板之后，最好的方法就是用我们的语法 把stl容器和算法实现一遍
+// 看看能不能做出同样的表达
