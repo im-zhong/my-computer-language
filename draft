@@ -264,3 +264,306 @@ fn for_each(c container, fn Fn) {
 
 // todo：设计出模板之后，最好的方法就是用我们的语法 把stl容器和算法实现一遍
 // 看看能不能做出同样的表达
+
+关于OO部分 参考 java C# C++ 就可以，这些语言的OO设计的非常好
+C++的OO灵活性太高，java和C#其实都是在C++之上做减法，做的也都相当不错，
+我大概看了一下，java和C#的OO部分基本的思想差不太多
+我的语言大概也想设计成java和C#那样，还是基于C++做减法
+
+但是java和C#都选择了无法创建global的变量和函数，也就是global的元素全都是类
+这一点我不太喜欢，这减少了很多表达力，减少了表达的方式
+可能在实际工程上限制表达的方式其实是一种好事
+
+class
+interface
+我很奇怪，C++里面是没有abstract的，因为抽象基类的作用就是定义接口, 是用 virtual function = 0; 来实现的 这个语法其实也不太好
+但是java和C#里面已经有interface接口这个关键字了，为什么还要再有一个abstract关键字??
+
+大概就是interface和class就可以了
+然后就是另外一个问题了，关于 access 部分，在语法上，C++是一类
+class CppClass {
+public:
+	xxx
+private:
+	xxx
+protected:
+	xxx
+};
+Java/C# 是一类
+class JavaCSharpClass {
+	public void Main() {}
+	private int var;
+}
+
+// 哪种更好呢？
+第一种的好处是打的字可以少一点，但是当一个类的代码较多时，你就很难直到某个成员变量或者成员函数的access, 感觉这并不是一个特别大的缺点，反而是 public: 这种语法不是很好看
+区分一个域 或者说 scope 其实就是 {} 这是非常符合直觉的
+第二种的好处是你可以明确的直到某个成员的access，但是写起来非常麻烦，打字非常多，放眼望去全是关键字，看不到重点的数据类型
+
+我们没有头文件和源文件了呀，如果一类特别长，这种现象在C++里面不常见，但是在模块化的语言里面，这种现象就非常常见了
+你还是用类似域的这种声明方式，就会导致你不知道这个函数的access等等的属性是什么
+所以java和C#采用这种语法是合理的
+
+我们可以将这两点结合起来，这样还可以强制的组织接口防止的位置，比如公共接口部分 都放在 public {} 里面 这样看代码也清晰
+// 这种设计还挺不错的
+// 还有就是继承类和实现接口的关键字应该叫什么
+// 在java里面是将两个关键字区分开了 继承叫做 extends 实现接口叫做 implement
+// 在C# C++里面是是用 : 代替了这两个功能
+// 只用一个关键字当然是好的，关键字越少，心智成本越低
+class MyClass impl Interface1 {
+	public override {
+		fn fun() return_type {
+
+		}
+
+		fn fun2() return {
+
+		}
+	}
+
+
+	public static {
+		fn 
+	}
+
+	public virtual {
+
+	}
+
+public virtual fn 
+
+// virtual是有实现的动态函数
+private virtual {
+
+}
+
+	// abstract是没有实现的动态函数
+	// 只要定义了一个这个玩意，那你为什么不直接定义接口？
+	public abstract {
+		
+	}
+
+protected {
+
+}
+
+private {
+	int i;
+	var i int;
+
+
+}
+}
+
+fn 
+
+var
+
+const 
+
+import 
+
+public class
+
+private class
+
+abstract class == interface ??
+
+// 默认属性是private！ 这样就可以解决写太多关键字的毛病
+
+class DefaultPrivateClass {
+
+}
+
+fn DefaultFunction() (return_type) {
+
+}
+
+public fn ExplicitPublicFunction() (return_type) {
+
+}
+
+// 这种域的语法设计其实还挺好的，其实可以保留啊
+public {
+
+}
+
+// 默认就是 private
+var {
+	name1 type
+	name2 type
+	name3 type
+	name4 = 123
+}
+
+const {
+	cname1 = c1value
+	cname2 = 123
+}
+
+// 这种数据类型就完全是一个简单的数据类型集合，没有任何的OO特性
+struct MyStruct {
+
+}
+
+array []
+tuple ()
+range [begin:end] 
+filter |
+
+if () {
+
+} else if () {
+
+} else {
+
+}
+
+if condition {
+
+} else if condition {
+
+} else {
+
+}
+
+// 但是如果不带括号，就会显得些许凌乱，对吧，一眼分不清关键字和循环体语句，判断条件等
+// 所以还是带括号吧
+// 为什么我们很多句子都带着标点符号呢，为什么会有标点符号的出现，不就是为了切断句子，可以更仔细的看清每个结构吗？
+// if (initializer; condition) {
+
+}
+// 所有的标点符号的出现，都是为了切断句子，关键字是关键字，初始化是初始化，条件是条件
+// 所以括号是好的，应该保留的，他增加了可读性，减少阅读负担
+for int i = 0; i < 100; i++ {
+
+}
+
+for (int i = 0; i < 100; i++) {
+
+}
+
+if (initializer; condition) {
+
+} else if (condition) {
+
+} else {
+
+}
+
+for {
+
+}
+
+// 这里为什么不用in? 因为前后都是文字，我们这里从语法上，还是从阅读理解上
+// 都需要将两个部分分开，前面是循环体要用的多个变量，后面是一个range或者container iterator等等
+// 中间需要一个东西将她们隔开，如果还是用英文字母 in 一眼看过去 起不到隔开句子的作用
+for (var var1, var2 : range1) {
+
+}
+
+// 但是如果支持filter操作，这样写的话，感觉就又不对了，冒号就没有将两者分开
+for (var var1, var2 : range1 | range2 | range3 | ...) {
+
+}
+// 这样的写法很难让人一眼就将变量声明部分和range部分分开，但是写成下面这样，就很容易让人分开
+for (var var1, var2 : range1 , range2 , range3 , ...) {
+
+}
+// 标点符号的大小，高度，位置等等，也会影响人从视觉上对句子成分的阅读
+// 但是filter这个操作使用 | 这个符号是非常非常符合直觉的，因为unix传下来的，用C++的又大部分都是后端，每天用linux shell
+// 所以 | 真的再合适不过了
+
+// 流怎么样, 也不怎么样
+for (var var1, var2 << range1 | range2 | range3) {
+
+}
+
+// 比如说我想要1-100以内的质数
+// 其中prime是一个函数，其实C++里面已经支持这种操作了，C++20的range，我觉得非常nice
+// slice 使用 [1..3] 这个操作符其实挺符合直觉的，这个操作符就是省略了中间的部分东西的意思 比 [1:3] 好多了
+for (var number : 1..101 | prime) {
+	printfln(number);
+}
+
+// [) 像这样的操作是不行滴 你无法遍历所有的整数
+// 但是我怎么像C++里面的lambda那样去捕获变量呢??
+// ! 我可以表示所有的整数啊，就是不写后面的不就行了吗 1.. 就这样写吗
+// 如果像变量所有的整数 ..
+// Int就是模板约束类型 这样会使得函数成为模板函数
+for (var number : .. | fn (Int n) { return n % 2 == 0 }) {
+
+}
+
+// 如果我想将输入序列排序再用怎么办呢
+// 这要怎么实现呢？？？
+// 到时候可以参考C++20 range 
+for (var number : container | sort) {
+
+}
+
+// 这样的话 . .. ... 都用了 哈哈
+
+// 这里用什么关键字其实并没有什么所谓，唯一的作用就是将前面类的声明和后面的基类，接口等区分开来
+// 而 : 可以很好的做到这一点，无疑是极好的选择，而且还少了一个关键字，perfect！
+public class MyClass : BaseClass1, Interface1 {
+	
+	// C#的这个get set语法深得我心 非常的好
+	int i {get; set};
+
+	// 属性 attribute 往往使用 [] 方括号来写
+	// 这表示编译器帮你做了一些事情
+	public static var {
+		[get, set]i int = {initializer};
+	}
+
+	var {
+		[get, set]i int = {0};
+		[get, set]a double = {0.0};
+	}
+
+	var i int
+	var d double
+
+	// 如果我希望所有的变量都自动生成get，set方法，那就在前面加上这个attribute
+	// 这样不就方便死了
+	private var {
+		[get, set]i = 0;
+		[get, set]d = 0.0;
+		[get, set]i = 0;
+		[get, set]d = 0.0;
+		[get, set]i = 0;
+		[get, set]d = 0.0;
+		[get, set]i = 0;
+		[get, set]d = 0.0;
+	}
+
+	// 但是这个attribute的设计必须要精妙， 如果只有这一个地方用到了get set
+	// 那还不如不用呢
+	// 还是说，这个会变成一个默认行为？？只要是private的变量，就会生成get set方法
+	// 不太好啊，我声明成private就是不想外部使用啊，对吧，你再给我默认生成 get set 这不找抽
+	private var[get, set] {
+		i = 0;
+		i = 0;
+		i = 0;
+		i = 0;
+		i = 0;
+		i = 0;
+		i = 0;
+		i = 0;
+		i = 0;
+	}
+
+	const {
+
+	}
+}
+
+// attribute 也可以用在类似这种地方，emm
+// 不过总觉得 attribute 这个设计不好
+// 这个玩意唯一的目的就是提供一个语法糖，可以自动生成 get/set方法 
+// 但是我们为了这一个语法糖引入了一个新的概念 attribute，这极大的增加了心智负担，应该有更好的方法
+fn[inline] fun(i int, d double) (b bool) {
+
+}
+
