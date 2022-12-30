@@ -1,0 +1,740 @@
+
+// 可以通过一个简单的规则来去掉这句话
+// 那就是每个文件就是一个模块 而文件名就是模块名
+// module heap;
+import os;
+
+fn main([]string argv) {
+    os.Println("hello, world!");
+}
+
+struct Heap {
+    *int data;
+    uint size;
+    uint capacity;
+};
+
+// 这个语法糖还是很不错的
+// 如果我们让一个文件就当作一个类来用呢
+// 默认的都是私有的
+// 如果这个时候再提供一个接口
+// 其实就和类差不多了
+// 但是这样就走偏了呀
+// 还是不要这样的好
+// 如果public也要缩写成 pub
+// 那么static要不要缩写成 sta啊？？
+// 也别缩写的太过分了
+public fn IntSize(*int) {
+    return 4;
+}
+
+fn Test() {
+    int i = 4;
+    // 你就可以做一个这样的调用
+    // 但是其实这只是一个语法糖而已
+    // 其实真正的函数调用是
+    // IntSize(addrof(i));
+    i.IntSize();
+}
+
+// 只要定义函数的时候是这个样子定义的
+// 那么调用的时候 就可以这样调用
+// 这里的heap是模块名
+// 不行 heap应该是变量名 不能是模块名
+// heap.Init()
+export fn Init(*Heap heap, uint capacity) {
+
+}
+
+// 默认都是local的 只有打上 export的 才可以被外面的文件引用
+fn heap_init(*Heap heap, uint capacit) {
+    heap.size = 0;
+    heap.capacity = capacity;
+    heap.data = new([]int, capacity);
+}
+
+fn heap_clean(*Heap heap) {
+    heap.size = 0;
+}
+
+fn heap_free(*Heap heap) {
+    delete(heap);
+}
+
+// & 相当于 const*
+// 但是类型描述里面不允许带着const
+fn heap_is_empty(&Heap heap) bool {
+    return heap.size == 0;
+}
+
+fn heap_is_full(&Heap heap) bool {
+    return heap.size == heap.capacity;
+}
+
+using cmpfn = fn(uint, uint)bool;
+
+fn heap_fixdown(*Heap heap, uint parent, fn(uint, uint)bool cmp) {
+    static uint left = 0;
+    uint right = 0;
+    uint child = 0;
+    // auto left = 0U; // 自动推导类型为 uint
+
+    for ((left = heap_left(parent)) <= heap.size) {
+        child = left;
+        right = left + 1;
+        if (right <= heap.size) {
+            child = cmp(left, right);
+        }
+
+        if (cmp(heap.data[parent], heap.data[child])) {
+            return;
+        }
+
+        auto tmp = heap.data[parent];
+        heap.data[parent] = heap.data[child];
+        heap.data[child] = tmp;
+        parent = child;
+    }
+}
+
+fn ReturnTwoValue() (uint v1 = 0, uint v2 = 0) {
+    return;
+}
+
+fn TestReturnTwoValue() {
+    auto v1, v2 = ReturnTwoValue();
+    os.Println(v1, v2);
+    os.Print("%d, %d\n", v1, v2);
+}
+
+// 我还是觉得这个引用的想法不好
+// 会让人觉得迷惑
+fn heap_top(&Heap heap) uint {
+    return heap.data[heap_root()];
+}
+
+// 但是带上const又非常的丑 暂时不实现了
+fn make_heap(const *Heap heap, fn(uint, uint)bool cmp) {
+    for (auto i : heap.data) {
+        heap_fixdown(heap, i, cmp);
+    }
+}
+
+fn heap_check(&Heap heap, fn(uint, uint)bool cmp) {
+    for (uint i = 0; i <= heap.size / 2; i += 1) {
+        uint left = heap_left(i);
+        if (left <= heap.size) {
+            auto r = cmp(heap.data[i], heap.data[left]);
+        }
+        auto right = heap_right(i);
+        if (right <= heap.size) {
+            cmp(i, right);
+        }
+    }
+}
+
+fn check() {
+    heap_check(nil, fn(uint left, uint right){
+        return left <= right;
+    });
+}
+
+struct ListNode {
+    *ListNode prev = nil;
+    *ListNode next = nil;
+};
+
+fn ListInsertBetween(*ListNode prev, *ListNode next, *ListNode node) {
+    prev.next = node;
+    node.prev = prev;
+    next.prev = node;
+    node.next = next;
+}
+
+fn ListFirst(*ListNode head) *ListNode {
+    return head.next;
+}
+
+// 如何提供for range的接口??
+// for range 需要一个 begin 一个 end 和一个 next
+fn ListForRange(*ListNode head, fn(*ListNode) handler) {
+    // 在这里利用普通的for循环实现
+
+    // 还支持一种这样的死循环
+    for {
+        // statements
+    }
+}
+
+import float;
+
+fn sp_dijkstra(*Graph graph, int vertex, *int distance, *ListNode spt) {
+    auto prev = new([]int, graph.size);
+    for (auto i : prev) {
+        prev[i] = i;
+    }
+
+    // for (auto i : 0...graph.size | fn(int i){return i %2 == 0;}) {
+    //    
+    // }
+
+    for (auto i : 0...graph.size) {
+        distance[i] = float.Max;
+    }
+
+    auto prev_weight = new([]int, graph.size);
+    for (auto i : prev_weight) {
+        prev_weight[i] = float.Max;
+    }
+
+    auto heap = Heap{
+        heap: heap,
+        value: disance,
+        type_size: sizeof(int),
+        cmp: fn (uint left, uint right) {
+            return left < right;
+        }
+    };
+
+    distance[vertex] = 0;
+    prev_weight[vertex] = 0;
+    // 这个其实就是一个语法糖
+    // 其实就是函数调用 HeapPush(*Heap, ...)
+    heap.push(vertex);
+
+    // 其实就是go语言的三种for循环
+    // 全都使用for来做了
+    // 普通的for循环
+    for (initializer; condition; post) {
+
+    }
+    // 普通的while循环
+    for (condition) {
+
+    }
+    // 死循环
+    for {
+
+    }
+    // 再加一个range
+    for (auto i : container | filter) {
+
+    }
+
+    for (!heap.IsEmpty()) {
+        auto v = heap.Top();
+        heap.Pop();
+
+        for (auto adj : graph.adj[v]) {
+            int from = v;
+            int to = adj.vertex;
+            int weight = adj.weight;
+
+            if (distance[to] > distance[from] + weight) {
+                prev[to] = from;
+                distance[to] = distance[from] + weight;
+                prev_weight[to] = weight;
+            }
+
+            if (!heap.Contain(to)) {
+                heap.Push(to);
+            } else {
+                heap.Update(to);
+            }
+        }
+    }
+
+    // 这样过滤更简单了
+    // 写表达式比写函数简单多了
+    // 不过函数也可以变成表达式
+    fn(){}()
+    // 像上面这样写 就是一个函数表达式
+    for (initizlier : container | bool_expression) {
+
+    }
+
+    for (auto i : 0...graph.size | prev[i] != i) {
+        auto edge = MakeEdge(prev[i], i, prev_weight[i]);
+        list_insert_after(spt, edge->node);
+    }
+}
+
+fn CheckArrayOrder([]int data) {
+    for (auto i : data | i < data.Size()) {
+        assert(data[i] <= data[i + 1]);
+    }
+}
+
+// 比如我们是指针数组
+// 如果我们只允许一级指针的话 是不是就解决问题了 ？？
+// 这样就不允许多级指针而已 对于表达力上几乎没有影响
+fn Test([]*ListNode lists) {
+
+}
+
+// 想一下怎么给某个类型定义for range的接口
+// 也就是 begin end next
+// 还需要一个迭代器类型
+// 这个迭代器拿着元素的指针 当我们需要
+
+fn Begin([]int array) *int {
+    return int[0];
+}
+
+fn End([]int array) *int {
+    return array.Size();
+}
+
+fn Next([]int array, *int it) {
+    it += 1;
+}
+
+// 那我们给出链表的迭代器
+fn Begin(*List list) *ListNode {
+    return list.head.next;
+}
+
+fn End(*List list) *ListNode {
+    return list.head;
+}
+
+fn Next(*List list, *ListNode node) *ListNode {
+    return node->next;
+}
+
+for (auto it : list | expr1 | expr 2 | expr 3) {
+    fn(it);
+}
+
+// 这就是for range, 就是这么简单
+for (auto it = list.Begin(); it != list.End(); it = list.Next(it)) {
+    if (expr1 && expr2 && expr3) {
+        fn(it);
+    }
+}
+
+// 还有枚举没有考虑 其实就是const
+// 枚举类型其实就是一组整形常量
+// 在cast的时候提供运行时检查
+using Weekdays = const int;
+Weekdays {
+    Monday = 0,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+    Sunday,
+};
+
+(Weekdays)1;
+cast<Weekdays>(1);
+
+// 这样看的话 这两个还挺像的
+cast(Weekdays, 1);
+new([]int, 10);
+
+// 比如说我们想转换指针类型
+cast(*void, &i);
+void* nil;
+cast(*int, nil);
+(*int)0
+
+// 为了保证描述性 还是保留C的生命结构 就只是改一下声明顺序
+// 也就是允许 
+// const ptr const int
+// const * const int
+// const int* const
+
+// 枚举要如何设计??
+// 其实就是修改C的毛病 不是单独的作用域 没有指定底层的类型
+// 其实就是C++的修改方法啊
+enum uint GraphColor {
+    white,
+    gray,
+    black,
+};
+
+// 这样的结构更好一点
+enum GraphColor : int {
+    white,
+    gray,
+    black,
+}
+
+// 和这种结构还挺像的 其实也挺好的
+class A : B {
+
+}
+
+// 这种就不太好 视觉上没有分开
+enum GraphColor uint {
+
+}
+
+// 这样你就可以给枚举类型实现一个ToString了
+fn ToString(GraphColor color) {
+    switch (color) {
+        case GraphColor.white: return "white";
+        case GraphColor.gray: return "gray";
+        case GraphColor.black: return "black";
+    }
+}
+
+// 这样我们就可以这样调用这个函数
+fn TestToString() {
+    auto color = GraphColor.gray;
+    os.Println(color.ToString());
+}
+
+// 如果不带分号 就会强制要求代码换行
+// 这样可以强制写不出不可读的代码333
+
+// 声明结构
+type name1, name2, ... = value1, value2, ...
+auto  自动推断类型
+const 自动推断类型的同时加上const描述符
+
+// 不引入 :=
+// 因为这个结构使得声明和赋值的差别变得不明显
+i := 1
+i = 1
+
+// 肯定不用err机制 还是用异常机制
+
+// go语言的几种literal的语法 我还是非常喜欢的
+Point{1, 2};
+auto arr = []int{1, 2, 3, 4};
+// 这种是好的
+
+没有分号也是好的 这样可以强制排版
+
+// slice 
+arr[0:1]
+
+for (auto i : arr[0:1]) {
+    os.Println(i)
+}
+
+// 对呀 如果不用动态类型 那么变参函数怎么实现呢
+fn Print(string fmt, ...) {
+    // 那就提供一个解包操作呗
+    // 像C++那样 提供两种访问包的形式
+    // 第一种是递归的 就是只展开第一个
+    // 第二种是迭代的
+
+    // 那么就必然需要一种在运行时检查类型的机制
+}
+
+sizeof(x)
+typeof(x)
+
+// 不对 这样是静态类型检查！
+// 因为这些东西是编译时已知的呀！！！
+// 没有任何运行时的负担 写起来又简单 好耶！
+switch (typeof(x)) {
+    case int: 
+    case uint:
+    case bool:
+    default:
+}
+
+// 这样使用for解包如何！完美
+for (auto arg : ...) {
+    switch (typeof(arg)) {
+        case int:
+        case uint:
+        case ...
+        default:
+    }
+}
+
+switch (value) {
+    case value1:
+    case value2:
+    default:
+}
+
+// 这种写法我很迷惑呀
+// 为什么不用if else呢
+switch {
+    case expression1:
+    case expression2:
+}
+
+// 对于内存来说 C++的析构和go的defer都非常好用
+// 我们在申请一块内存或者new一个变量的时候 我们希望可以用defer来释放资源
+// 模拟类的析构 这是非常好的行为
+fn TestDefer() {
+    auto pi = new(int)
+    defer free(pi)
+
+    // go语言限制defer后面必须跟一个函数
+    // 但是是不是不需要有这样的限制？？
+    // 我们就可以简单的跟一个statement
+    // 就执行这个statement就行了
+    defer for {
+
+    }
+
+    defer if () {
+
+    }
+
+    defer i += 1
+    // 这样真的好吗？？
+
+    auto file = os.open("filename")
+    defer os.close(file)
+
+    // 还可以写像这样的句子 非常简单
+    defer fn() {
+
+    }()
+}
+
+// 需要像go那样提供一系列的内置数据类型吗
+// 其实是应该提供的 这样写代码简单 但是实现起来就麻烦了 所以还是算了
+// 第一版应该是一个足够简单的语言 最起码能实现出来
+
+// 写一个huffman 这个麻烦
+
+fn HuffmanCompress(string filename) {
+    // 可以采用C++的方式 这样写就执行默认初始化
+    auto freq = [ASCII_SIZE]uint{}
+    auto fin = os.Open(filename)
+    defer os.Close(fin)
+
+    // 用这样的方式遍历文件
+    uint len = 0
+    for (auto c : os.Stream()) {
+        freq[cast(uint, c)] += 1
+        len += 1
+    }
+
+    auto root = make_huffman_tree(freq)
+    auto fout = os.Open(get_compress_filename(name))
+    defer fout.Close()
+
+    auto outbf = make_bitbuf(fout)
+    write_huffman_tree_to_file(outbf, root)
+
+
+    // 感觉全是auto也不是什么好事
+    // 怪不得呢 go用 := 
+
+    // 这俩都支持自动类型推断
+    var 
+    const 
+
+    // 这样写就是自动推断出来一个常量 int 其值为 1024
+    const len = 1024;
+    // 相当于
+    const int len = 1024;
+
+    var len = 1024;
+    // 相当于
+    int len = 1204;
+
+    // 这样的声明方式对称啊
+    const stu = Student{
+        id: 123
+        name: "zhangzhong"
+        major: Major.Math
+    }
+
+    stu := Student{
+
+    }
+
+    stu = Student{
+
+    }
+
+    var stu = Student{
+
+    }
+
+    // 全是类型看起来有压力 还是没有类型看起来有压力呢
+    // 当我们浏览代码的时候 我们关注的往往是逻辑 而不是具体的实现
+    // 如果一份代码的名字起得非常好 那么过多的类型提示符反而会阻碍我们看代码
+    // 相反 名字起的不好 我们就需要依赖变量的类型类确定这份代码究竟干了什么
+
+    var i, j, k = 1, 2, 3
+    const i, j, k = 1, 2, 3
+
+
+
+}
+
+fn get_decompress_filename(string filename) string {
+    if (filename.IsSuffix(".huf")) {
+        return filename.ErasePostfix(".huf")
+    } else {
+        return filename + ".debuf"
+    }
+}
+
+
+fn TestException() (return type list) {
+    // 这样的话我们就不需要try关键字了
+    // 而且可以减少嵌套深度
+    // 而且可以强制可能产生异常的代码放在一个函数段里
+    // 因为现在触发异常的单位是一个函数 而不是一句代码
+
+    throw Exception{
+        reason: "hello"
+    }
+
+} catch(*Exception e) {
+    os.Print(e.Reason())
+} catch {
+    // 这样写就是任意的异常都会被catch
+}
+
+// 作出重大改变 让类型后置
+// 参考go和rust
+// 目的是什么 是尽量减少书写的代码
+// 然后尽量多的提供便捷的特性 尽量的容易理解
+
+fn GetDecompressFilename(name string) string {
+    // 引入新的符号
+    := 
+    // 表示定义 非常简单
+    // 不行 你不能用复杂的定义 只能这样定义
+    auto i = 1
+    const i = 1
+
+    // 如果变换了类型生命顺序还想要前置类型的话 
+    // 你想定义一个数组就得写成这样
+    []int array = []int{1, 2, 3}
+
+    // 但是说实话 这样就更丑了
+    array []int = 
+
+}
+
+// go rust的一个共同特点就是 if for 等等这些句子没有括号
+// 因为从语法上来讲这些括号不是必须的 所以这是负担 所以可以去掉
+// 而且也都没有分号 也都应该去掉
+
+fn Test() {
+    if condition {
+
+    } else if condition {
+
+    } else {
+
+    }
+
+    for initializer; condition; post {
+
+    }
+
+    // 或者我们让规则严苛一点
+    // 只要是定义必须是 :=
+    // 如果是赋值 必须是 =
+    // 否则在if和for的句子里面 打一个 var let auto 之类的很影响代码的阅读
+    if err := Error(); err != nil {
+
+    }
+
+    // 如果没有括号的话 就得是in了
+    // 这样 两个点就行了
+    auto v = for i := 0..99 | i % 2 == 0 | i % 3 == 0 {
+        break i
+    }
+
+    i := if condition { v1 } else { v2 }
+
+    for key, value := map {
+        os.Print("%s: %s", key, value)
+    }
+
+
+
+    // 就提供一个内嵌asm就行
+    // 这个本身实现起来就非常简单
+    // 不对 内嵌真的好吗 我们往往想要实现的是一整个汇编函数
+    // 或者说 我们把某个函数用汇编实现才是对的
+    // 也就是说汇编代码是以函数为单位的
+    asm {
+
+    }
+
+    // 还是算了
+    c {
+    }
+
+    // 变量定义只能
+    name := TypeLiteral
+    // 常量的定义就在前面加上一个const即可
+    const cname := TypeLiteral
+
+    // 比如我们想定义一个uint8 并赋值1
+    name := uint8{1}
+    // 我们想定义一个
+    // 如果大部分的字符常量都可以省掉这个uint8
+    // 比如你想定义一个普通的int
+    i := 1
+    // 就这样即可
+    d := 0.0
+    // 但是复杂的类型 特别指定的类型 必须统一服从TypeLietral的语法
+    // 这个语法是从C++11学来的 还挺好的
+    // 想要进行默认初始化就打一个空的{}即可
+    i := uint8{}
+    // 还可以一下子定义多个
+    i, j, k := uint8{}, 如果都是重复的类型 则可以省略
+    // 如果每个都是不同的类型 则需要挨个指定
+    i, j, k := 0, 0.0, "hello"
+    // 像这样
+
+    // 采用这种类似json的写法就行
+    stu := Student{
+        key1: value1,
+        key2: value2,
+        key3: value3
+    }
+
+    // 当然你可以不写名字
+    // 大括号里面还是需要带着逗号的
+    stu := Student{
+        value1,
+        value2,
+        value3
+    }
+
+    // 不然数组不也不需要逗号了吗
+    arr := []int{1, 2, 3, 4, 5, 6}
+
+} catch(e *Exception) {
+
+} catch {
+
+}
+
+// 也就是这样才是对的！！！
+// 完美
+asm TestAsm() {
+
+    // 这种语法是真的帅
+    // 但是在没有实现模板之前还是不能用
+    cast<int>()
+    // C++模板的复杂性有很大一部分源自引用的出现
+    // 所以我们直接不加入引用 因为他和指针一样一样的呀
+}
+
+struct Student {
+    name    string
+    id      uint
+    major   []string
+}
+
+// 这两种结构是不是挺像的
+enum Monday : uint {
+
+}
+
+class MyClass : BaseClass {
+
+}
